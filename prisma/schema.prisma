@@ -1,0 +1,75 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Metric {
+  id              String   @id @default(cuid())
+  accountValue    Float
+  totalPnl        Float
+  totalPnlPercent Float
+  unrealizedPnl   Float
+  realizedPnl     Float
+  balance         Float
+  createdAt       DateTime @default(now())
+  
+  @@index([createdAt])
+}
+
+model Trade {
+  id              String   @id @default(cuid())
+  modelId         String
+  symbol          String
+  side            String   // 'buy' or 'sell'
+  amount          Float
+  price           Float
+  totalValue      Float
+  reasoning       String   @db.Text
+  status          String   // 'pending', 'executed', 'failed'
+  error           String?  @db.Text
+  createdAt       DateTime @default(now())
+  executedAt      DateTime?
+  
+  @@index([createdAt])
+  @@index([modelId])
+}
+
+model ChatHistory {
+  id              String   @id @default(cuid())
+  modelId         String
+  role            String   // 'user', 'assistant', 'system'
+  content         String   @db.Text
+  toolCalls       Json?
+  toolResults     Json?
+  createdAt       DateTime @default(now())
+  
+  @@index([modelId, createdAt])
+}
+
+model Position {
+  id              String   @id @default(cuid())
+  symbol          String   @unique
+  side            String   // 'long' or 'short'
+  size            Float
+  entryPrice      Float
+  currentPrice    Float
+  unrealizedPnl   Float
+  leverage        Float    @default(1)
+  updatedAt       DateTime @updatedAt
+  
+  @@index([symbol])
+}
+
+model CryptoPrice {
+  id              String   @id @default(cuid())
+  symbol          String
+  price           Float
+  change24h       Float
+  updatedAt       DateTime @updatedAt
+  
+  @@unique([symbol])
+}

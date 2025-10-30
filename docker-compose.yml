@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: nof1ai-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: nof1ai
+      POSTGRES_PASSWORD: nof1ai_password
+      POSTGRES_DB: nof1ai
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nof1ai"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nof1ai-app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://nof1ai:nof1ai_password@postgres:5432/nof1ai?schema=public
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY}
+      BINANCE_API_KEY: ${BINANCE_API_KEY}
+      BINANCE_API_SECRET: ${BINANCE_API_SECRET}
+      CRON_SECRET: ${CRON_SECRET}
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+      NODE_ENV: production
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./test:/app/test
+
+volumes:
+  postgres_data:

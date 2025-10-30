@@ -1,0 +1,13 @@
+请创建 .env.local 文件，包含以下内容：
+
+DATABASE_URL="postgresql://nof1ai:nof1ai_password@localhost:5432/nof1ai?schema=public"
+DEEPSEEK_API_KEY="your-deepseek-api-key"
+BINANCE_API_KEY="your-binance-api-key"
+BINANCE_API_SECRET="your-binance-api-secret"
+CRON_SECRET="your-secure-random-string"
+NEXT_PUBLIC_APP_URL="http://localhost:3000"
+
+注意：
+1. 如果没有 DeepSeek API Key，可以从 https://platform.deepseek.com/ 获取
+2. 如果没有 Binance API Key，系统会使用模拟数据
+3. CRON_SECRET 可以是任意随机字符串，用于保护 cron 端点
