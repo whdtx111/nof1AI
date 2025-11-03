@@ -3,11 +3,6 @@ setlocal
 
 echo ========================================
 echo Starting NOF1.AI Application
-@echo off
-setlocal
-
-echo ========================================
-echo Starting NOF1.AI Application
 echo ========================================
 echo.
 
@@ -56,7 +51,7 @@ if errorlevel 1 (
 
 REM Push database schema
 echo [4/5] Pushing database schema...
-call npm run devb:push
+call npm run db:push
 if errorlevel 1 (
     echo [ERROR] Failed to push database schema!
     pause

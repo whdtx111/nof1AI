@@ -1,6 +1,7 @@
 version: '3.8'
 
 services:
+  # PostgreSQL 数据库
   postgres:
     image: postgres:16-alpine
     container_name: nof1ai-postgres
@@ -9,6 +10,8 @@ services:
       POSTGRES_USER: nof1ai
       POSTGRES_PASSWORD: nof1ai_password
       POSTGRES_DB: nof1ai
+      POSTGRES_INITDB_ARGS: "-E UTF8"
+      LANG: en_US.utf8
     ports:
       - "5432:5432"
     volumes:
@@ -18,7 +21,28 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - nof1ai-network
 
+  # 可选: pgAdmin 数据库管理工具
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: nof1ai-pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@nof1ai.local
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    networks:
+      - nof1ai-network
+    profiles:
+      - tools
+
+  # Next.js 应用 (可选，用于生产环境)
   app:
     build:
       context: .
@@ -29,17 +53,23 @@ services:
       - "3000:3000"
     environment:
       DATABASE_URL: postgresql://nof1ai:nof1ai_password@postgres:5432/nof1ai?schema=public
-      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY}
-      BINANCE_API_KEY: ${BINANCE_API_KEY}
-      BINANCE_API_SECRET: ${BINANCE_API_SECRET}
-      CRON_SECRET: ${CRON_SECRET}
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-sk-test}
+      BINANCE_API_KEY: ${BINANCE_API_KEY:-test}
+      BINANCE_API_SECRET: ${BINANCE_API_SECRET:-test}
+      CRON_SECRET: ${CRON_SECRET:-test-secret}
       NEXT_PUBLIC_APP_URL: http://localhost:3000
       NODE_ENV: production
     depends_on:
       postgres:
         condition: service_healthy
-    volumes:
-      - ./test:/app/test
+    networks:
+      - nof1ai-network
+    profiles:
+      - production
+
+networks:
+  nof1ai-network:
+    driver: bridge
 
 volumes:
   postgres_data:

@@ -14,9 +14,9 @@ export async function getAccountBalance() {
     const balance = await exchange.fetchBalance()
     const positions = await exchange.fetchPositions()
     
-    const totalBalance = balance.total.USDT || 0
-    const freeBalance = balance.free.USDT || 0
-    const usedBalance = balance.used.USDT || 0
+    const totalBalance = (balance.total as any)?.USDT || 0
+    const freeBalance = (balance.free as any)?.USDT || 0
+    const usedBalance = (balance.used as any)?.USDT || 0
     
     let unrealizedPnl = 0
     let totalPositionValue = 0
