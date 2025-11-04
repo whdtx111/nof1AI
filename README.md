@@ -26,6 +26,7 @@
 
 - Node.js 20+ 
 - Docker Desktop (用于运行PostgreSQL)
+  - **遇到安装问题？** 查看 [Docker安装指南](DOCKER-INSTALL-GUIDE.txt)
 - Binance API密钥 (可选，用于实盘交易)
 - DeepSeek API密钥 (可选，用于AI决策)
 
